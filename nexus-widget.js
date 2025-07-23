@@ -10,6 +10,7 @@
 
 :root {
   /* Colour scale */
+  --nx-brand-red:  #E73A4E;
   --nx-orange-500: #FD921E;
   --nx-orange-600: #FF621D;
   --nx-orange-700: #FF2C3D;
@@ -163,7 +164,9 @@
 .nx-chat__send svg {
   width: 1.25rem;
   height: 1.25rem;
-  fill: #fff;
+}
+.nx-chat__send svg path {
+  stroke: #fff; /* Ensure path stroke is white */
 }
 .nx-chat__send:hover   { background: var(--nx-orange-600); transform: translateY(-2px); }
 .nx-chat__send:active  { background: var(--nx-orange-700); transform: translateY( 0); }
@@ -255,7 +258,7 @@
     // Widget configuration
     const config = {
         position: 'bottom-right',
-        primaryColor: '#007bff',
+        primaryColor: '#E73A4E', // Use brand red
         textColor: '#ffffff',
         companyName: 'Nexus Tours',
         apiUrl: 'https://nexus-development.onrender.com', // Directly set to Render URL
@@ -303,7 +306,7 @@
                 width: 60px;
                 height: 60px;
                 border-radius: 50%;
-                background-color: ${config.primaryColor};
+                background: var(--nx-brand-red); /* Use brand solid red */
                 color: ${config.textColor};
                 display: flex;
                 align-items: center;
@@ -323,13 +326,13 @@
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
                     <span>${config.companyName}</span>
-                    <button id="nexus-widget-close" style="margin-left:auto;background:none;border:none;color:#fff;cursor:pointer;font-size:1.25rem;line-height:1;">×</button>
+                    <button id="nexus-widget-close" style="margin-left:auto;background:none;border:none;color:#fff;cursor:pointer;font-size:1.25rem;line-height:1;">&times;</button>
                 </div>
                 <div class="nx-chat__body" id="nexus-widget-messages"></div>
                 <div class="nx-chat__input">
                     <textarea class="nx-chat__textarea" id="nexus-widget-message-input" placeholder="Type your message..."></textarea>
                     <button class="nx-chat__send" id="nexus-widget-send">
-                        <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="2" fill="none"/></svg>
                     </button>
                 </div>
             </div>
