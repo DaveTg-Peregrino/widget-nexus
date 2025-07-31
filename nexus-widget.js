@@ -260,8 +260,8 @@
         position: 'bottom-right',
         primaryColor: '#E73A4E', // Use brand red
         textColor: '#ffffff',
-        companyName: 'Nexus Tours',
-        apiUrl: 'https://nexus-development.onrender.com', // Directly set to Render URL
+        companyName: 'NexusTours',
+        apiUrl: 'https://nexus-staging-dupl.onrender.com', // Directly set to Render URL
         widgetId: null,
         pollingInterval: 5000 // Intervalo de sondeo en milisegundos (ej. 5 segundos)
     };
@@ -329,6 +329,9 @@
                     <button id="nexus-widget-close" style="margin-left:auto;background:none;border:none;color:#fff;cursor:pointer;font-size:1.25rem;line-height:1;">&times;</button>
                 </div>
                 <div class="nx-chat__body" id="nexus-widget-messages"></div>
+                <div id="nexus-widget-end-chat-container" style="padding: 8px; text-align: center; background: var(--nx-gray-100);">
+                    <button id="nexus-widget-end-chat" style="background: none; border: none; color: var(--nx-brand-red); cursor: pointer; font-size: 0.8rem; font-weight: bold;">End Chat</button>
+                </div>
                 <div class="nx-chat__input">
                     <textarea class="nx-chat__textarea" id="nexus-widget-message-input" placeholder="Type your message..."></textarea>
                     <button class="nx-chat__send" id="nexus-widget-send">
@@ -369,11 +372,13 @@
         // Set up event listeners
         const chatButton = document.getElementById('nexus-widget-button');
         const closeButton = document.getElementById('nexus-widget-close');
+        const endChatButton = document.getElementById('nexus-widget-end-chat');
         const sendButton = document.getElementById('nexus-widget-send');
         const messageInput = document.getElementById('nexus-widget-message-input');
 
         chatButton.addEventListener('click', toggleWidget);
         closeButton.addEventListener('click', toggleWidget);
+        endChatButton.addEventListener('click', endChat);
         sendButton.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -382,9 +387,35 @@
             }
         });
 
-        // Initialize session
-        initializeSessionAndThread();
+        // Session is initialized when the widget is opened.
         enableResizing();
+    }
+
+    async function endChat() {
+        if (!threadId) {
+            addMessageSafely('system', 'There is no active conversation to end.');
+            return;
+        }
+
+        if (confirm('Are you sure you want to end this chat?')) {
+            try {
+                const response = await fetch(`${config.apiUrl}/threads/${threadId}/resolve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to end the chat. Please try again.');
+                }
+                
+                // The WebSocket message 'thread_status_update' will handle the UI changes.
+                console.log('Chat successfully marked as resolved.');
+
+            } catch (error) {
+                console.error('Error ending chat:', error);
+                addMessageSafely('system', error.message || 'An error occurred while trying to end the chat.');
+            }
+        }
     }
 
     // Toggle widget visibility
@@ -474,7 +505,7 @@
                     // If the thread is valid but empty, show the welcome message
                     if (messagesContainer && messagesContainer.children.length === 0) {
                         console.log('Thread is empty. Adding welcome message.');
-                        addMessageSafely('assistant', 'Welcome to Nexus Tours! How can I assist you today?', null, 'msg_welcome');
+                        addMessageSafely('assistant', 'Welcome to NexusTours! How can I assist you today?', null, 'msg_welcome');
                     }
 
                     // Thread is valid, set up real-time communication with delay
@@ -533,7 +564,7 @@
             if (threadId) {
                 localStorage.setItem('nexus_thread_id', threadId);
                 console.log('✅ New thread created:', threadId);
-                addMessageSafely('assistant', 'Welcome to Nexus Tours! How can I assist you today?', null, 'msg_welcome');
+                addMessageSafely('assistant', 'Welcome to NexusTours! How can I assist you today?', null, 'msg_welcome');
                 
                 // Give server time to fully process the thread creation
                 console.log('⏳ Waiting for server to process thread creation...');
@@ -718,6 +749,11 @@
         }
         const sendButton = document.getElementById('nexus-widget-send');
         if (sendButton) sendButton.disabled = true;
+        
+        const endChatContainer = document.getElementById('nexus-widget-end-chat-container');
+        if (endChatContainer) {
+            endChatContainer.style.display = 'none';
+        }
 
         console.log('Conversation closed. Input disabled, history preserved until page reload.');
     }
@@ -1107,7 +1143,7 @@
             // Merge default config with provided config
             const defaultConfig = {
                 apiUrl: 'http://localhost:5000/api',
-                companyName: 'Nexus Tours',
+                companyName: 'NexusTours',
                 primaryColor: '#FD921E',
                 textColor: '#FFFFFF',
                 position: 'bottom-right'
