@@ -1,7 +1,7 @@
 /**
  * Nexus Tours Widget
  * A customizable chat widget for customer support
- * VERSION 2.0 - With Professional Markdown Rendering
+ * VERSION 2.0 - With Professional Markdown Rendering + Enhanced Engagement Cues
  */
 
 (function() {
@@ -54,6 +54,14 @@
   font-family: var(--nx-font-body);
   color: var(--nx-text-900);
   z-index: 9999;
+  transform: scale(0.9);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.nx-chat.nx-chat--open {
+  transform: scale(1);
+  opacity: 1;
 }
 
 /* 3. Header */
@@ -254,16 +262,148 @@
     cursor: nwse-resize;
     z-index: 10;
 }
+
+/* 12. Enhanced Engagement Cue Animations for Maximum Attention */
+@keyframes nexus-glow-intense {
+    0% { 
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        transform: scale(1);
+    }
+    25% { 
+        box-shadow: 0 2px 25px rgba(231, 58, 78, 0.6), 0 0 35px rgba(231, 58, 78, 0.4);
+        transform: scale(1.02);
+    }
+    50% { 
+        box-shadow: 0 4px 30px rgba(231, 58, 78, 0.8), 0 0 40px rgba(231, 58, 78, 0.6), inset 0 0 20px rgba(231, 58, 78, 0.2);
+        transform: scale(1.05);
+    }
+    75% { 
+        box-shadow: 0 2px 25px rgba(231, 58, 78, 0.6), 0 0 35px rgba(231, 58, 78, 0.4);
+        transform: scale(1.02);
+    }
+    100% { 
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        transform: scale(1);
+    }
+}
+
+@keyframes nexus-pulse-urgent {
+    0% { transform: scale(1); }
+    20% { transform: scale(1.08); }
+    40% { transform: scale(1.12); }
+    60% { transform: scale(1.08); }
+    80% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes nexus-bounce-attention {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0) scale(1); }
+    10% { transform: translateY(-8px) scale(1.05); }
+    30% { transform: translateY(-12px) scale(1.08); }
+    40% { transform: translateY(-6px) scale(1.03); }
+    60% { transform: translateY(-8px) scale(1.05); }
+    70% { transform: translateY(-4px) scale(1.02); }
+}
+
+@keyframes nexus-notification-dot-urgent {
+    0% { opacity: 0; transform: scale(0); }
+    25% { opacity: 1; transform: scale(1.5); }
+    50% { opacity: 1; transform: scale(1.2); }
+    75% { opacity: 1; transform: scale(1.4); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nexus-attention-ring {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(231, 58, 78, 0.7);
+        transform: scale(1);
+    }
+    25% {
+        box-shadow: 0 0 0 8px rgba(231, 58, 78, 0.5);
+        transform: scale(1.02);
+    }
+    50% {
+        box-shadow: 0 0 0 16px rgba(231, 58, 78, 0.3);
+        transform: scale(1.05);
+    }
+    75% {
+        box-shadow: 0 0 0 12px rgba(231, 58, 78, 0.2);
+        transform: scale(1.02);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(231, 58, 78, 0);
+        transform: scale(1);
+    }
+}
+
+.nexus-glowing {
+    animation: nexus-glow-intense 2.5s ease-in-out infinite;
+}
+
+.nexus-pulsing {
+    animation: nexus-pulse-urgent 1.2s ease-in-out 4; /* More pulses, faster */
+}
+
+.nexus-bouncing {
+    animation: nexus-bounce-attention 0.8s ease-in-out 3; /* More bounces */
+}
+
+.nexus-attention-ring {
+    animation: nexus-attention-ring 2s ease-out infinite;
+}
+
+.nexus-notification-dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 14px; /* Slightly larger */
+    height: 14px;
+    background: #ff4757;
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: nexus-notification-dot-urgent 0.5s ease-out;
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+}
+
+/* 13. Chat button styles */
+.nx-chat-button {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--nx-brand-red);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.nx-chat-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(231, 58, 78, 0.3);
+}
 `;
+
     // Widget configuration
     const config = {
         position: 'bottom-right',
-        primaryColor: '#E73A4E', // Use brand red
+        primaryColor: '#E73A4E',
         textColor: '#ffffff',
         companyName: 'NexusTours',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com', // Directly set to Render URL
+        apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
-        pollingInterval: 5000 // Intervalo de sondeo en milisegundos (ej. 5 segundos)
+        pollingInterval: 5000,
+        // Engagement settings
+        enableGlow: true,
+        enableSound: true,
+        enablePulse: true,
+        initialDelay: 3000,
+        reminderInterval: 45000,
+        maxReminders: 3
     };
 
     // Widget state
@@ -273,13 +413,19 @@
     let threadId = null;
     let pollingTimer = null;
     let socket = null;
-    let displayedMessages; // Track displayed message IDs
+    let displayedMessages;
     let messagesContainer;
     let wsReconnectAttempts = 0;
     let maxReconnectAttempts = 3;
     let wsReconnectTimer = null;
     let isWebSocketEnabled = true;
     let heartbeatInterval = null;
+    
+    // Engagement state
+    let hasInteracted = false;
+    let reminderCount = 0;
+    let reminderTimer = null;
+    let playNotificationSound = null;
 
     // Generate a unique device ID
     function generateDeviceId() {
@@ -288,6 +434,377 @@
             const v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
+    }
+
+    // Create sophisticated notification sound that creates urgency
+    function createNotificationSound() {
+        let audioContext = null;
+        let isAudioEnabled = false;
+        
+        // Method 1: Try Web Audio API (primary) - More sophisticated message sound
+        function initWebAudio() {
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) {
+                    console.log('🔇 Web Audio API not supported');
+                    return false;
+                }
+                
+                audioContext = new AudioContextClass();
+                console.log('🔊 Web Audio API initialized successfully');
+                return true;
+            } catch (error) {
+                console.log('🔇 Web Audio API initialization failed:', error);
+                return false;
+            }
+        }
+        
+        // Method 2: HTML5 Audio fallback with sophisticated message sound
+        function createHTML5Audio() {
+            try {
+                // Create multiple audio elements for different notification types
+                const urgentSound = new Audio();
+                urgentSound.volume = 0.4; // Higher volume for urgency
+                
+                // Create sophisticated multi-tone notification sound programmatically
+                // This will create a rising triple-tone sequence that demands attention
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                function createMessageTone() {
+                    const oscillator1 = audioContext.createOscillator();
+                    const oscillator2 = audioContext.createOscillator();
+                    const oscillator3 = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    // Create a filter for warmer sound
+                    const filter = audioContext.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(2000, audioContext.currentTime);
+                    
+                    oscillator1.connect(filter);
+                    oscillator2.connect(filter);
+                    oscillator3.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // Rising three-tone sequence like iPhone/WhatsApp notifications
+                    // First tone: 520Hz (C5)
+                    oscillator1.frequency.setValueAtTime(520, audioContext.currentTime);
+                    oscillator1.frequency.setValueAtTime(520, audioContext.currentTime + 0.15);
+                    
+                    // Second tone: 659Hz (E5) - creates urgency
+                    oscillator2.frequency.setValueAtTime(659, audioContext.currentTime + 0.15);
+                    oscillator2.frequency.setValueAtTime(659, audioContext.currentTime + 0.3);
+                    
+                    // Third tone: 784Hz (G5) - completion/call-to-action
+                    oscillator3.frequency.setValueAtTime(784, audioContext.currentTime + 0.3);
+                    oscillator3.frequency.setValueAtTime(784, audioContext.currentTime + 0.5);
+                    
+                    // Sophisticated volume envelope
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    
+                    // First tone envelope
+                    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+                    gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.15);
+                    
+                    // Second tone envelope (louder for urgency)
+                    gainNode.gain.linearRampToValueAtTime(0.35, audioContext.currentTime + 0.2);
+                    gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.3);
+                    
+                    // Third tone envelope (loudest for call-to-action)
+                    gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.35);
+                    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.55);
+                    
+                    // Start oscillators at different times
+                    oscillator1.start(audioContext.currentTime);
+                    oscillator1.stop(audioContext.currentTime + 0.15);
+                    
+                    oscillator2.start(audioContext.currentTime + 0.15);
+                    oscillator2.stop(audioContext.currentTime + 0.3);
+                    
+                    oscillator3.start(audioContext.currentTime + 0.3);
+                    oscillator3.stop(audioContext.currentTime + 0.55);
+                }
+                
+                console.log('🔊 HTML5 Audio with sophisticated message tone initialized');
+                
+                return function() {
+                    if (!config.enableSound) return;
+                    try {
+                        if (audioContext.state === 'suspended') {
+                            audioContext.resume().then(() => {
+                                createMessageTone();
+                            });
+                        } else {
+                            createMessageTone();
+                        }
+                        console.log('🔔 Playing sophisticated message notification');
+                    } catch (error) {
+                        console.log('🔇 HTML5 Audio playback error:', error);
+                    }
+                };
+            } catch (error) {
+                console.log('🔇 HTML5 Audio creation failed:', error);
+                return function() {};
+            }
+        }
+        
+        // Primary Web Audio API function with sophisticated message sound
+        function playWebAudio() {
+            if (!config.enableSound || !audioContext) return;
+            
+            try {
+                // Resume audio context if suspended
+                if (audioContext.state === 'suspended') {
+                    console.log('🔊 Resuming suspended audio context...');
+                    audioContext.resume().then(() => {
+                        console.log('🔊 Audio context resumed successfully');
+                        playActualMessageSound();
+                    }).catch(e => {
+                        console.log('🔇 Failed to resume audio context:', e);
+                    });
+                } else {
+                    playActualMessageSound();
+                }
+                
+                function playActualMessageSound() {
+                    // Create sophisticated multi-layer message notification
+                    // This creates urgency like WhatsApp, Telegram, or Slack notifications
+                    
+                    const filter = audioContext.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(3000, audioContext.currentTime);
+                    filter.Q.setValueAtTime(1, audioContext.currentTime);
+                    
+                    const mainGain = audioContext.createGain();
+                    filter.connect(mainGain);
+                    mainGain.connect(audioContext.destination);
+                    
+                    // THREE-TONE ASCENDING SEQUENCE (like iPhone message tone)
+                    // This creates psychological urgency and demands attention
+                    
+                    // TONE 1: 520Hz (C5) - Attention grabber
+                    const osc1 = audioContext.createOscillator();
+                    const gain1 = audioContext.createGain();
+                    osc1.connect(gain1);
+                    gain1.connect(filter);
+                    
+                    osc1.frequency.setValueAtTime(520, audioContext.currentTime);
+                    osc1.type = 'triangle'; // Warmer sound than sine
+                    
+                    gain1.gain.setValueAtTime(0, audioContext.currentTime);
+                    gain1.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.03);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+                    
+                    osc1.start(audioContext.currentTime);
+                    osc1.stop(audioContext.currentTime + 0.15);
+                    
+                    // TONE 2: 659Hz (E5) - Creates tension/urgency
+                    const osc2 = audioContext.createOscillator();
+                    const gain2 = audioContext.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(filter);
+                    
+                    osc2.frequency.setValueAtTime(659, audioContext.currentTime + 0.15);
+                    osc2.type = 'triangle';
+                    
+                    gain2.gain.setValueAtTime(0, audioContext.currentTime + 0.15);
+                    gain2.gain.linearRampToValueAtTime(0.35, audioContext.currentTime + 0.18);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                    
+                    osc2.start(audioContext.currentTime + 0.15);
+                    osc2.stop(audioContext.currentTime + 0.3);
+                    
+                    // TONE 3: 784Hz (G5) - Resolution/Call-to-action
+                    const osc3 = audioContext.createOscillator();
+                    const gain3 = audioContext.createGain();
+                    osc3.connect(gain3);
+                    gain3.connect(filter);
+                    
+                    osc3.frequency.setValueAtTime(784, audioContext.currentTime + 0.3);
+                    osc3.type = 'triangle';
+                    
+                    gain3.gain.setValueAtTime(0, audioContext.currentTime + 0.3);
+                    gain3.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.33);
+                    gain3.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.55);
+                    
+                    osc3.start(audioContext.currentTime + 0.3);
+                    osc3.stop(audioContext.currentTime + 0.55);
+                    
+                    // HARMONY LAYER: Adds richness and urgency
+                    const oscHarmony = audioContext.createOscillator();
+                    const gainHarmony = audioContext.createGain();
+                    oscHarmony.connect(gainHarmony);
+                    gainHarmony.connect(filter);
+                    
+                    // Subtle harmony that follows the main sequence
+                    oscHarmony.frequency.setValueAtTime(415, audioContext.currentTime); // Perfect fifth below
+                    oscHarmony.frequency.setValueAtTime(523, audioContext.currentTime + 0.15);
+                    oscHarmony.frequency.setValueAtTime(622, audioContext.currentTime + 0.3);
+                    oscHarmony.type = 'sine'; // Subtle background
+                    
+                    gainHarmony.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainHarmony.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.05);
+                    gainHarmony.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.2);
+                    gainHarmony.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.35);
+                    gainHarmony.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.55);
+                    
+                    oscHarmony.start(audioContext.currentTime);
+                    oscHarmony.stop(audioContext.currentTime + 0.55);
+                    
+                    // MASTER VOLUME ENVELOPE
+                    mainGain.gain.setValueAtTime(0.8, audioContext.currentTime); // Higher volume for urgency
+                    mainGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.1);
+                    mainGain.gain.linearRampToValueAtTime(0.9, audioContext.currentTime + 0.4);
+                    mainGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.6);
+                    
+                    console.log('🔔 Playing sophisticated message notification (3-tone ascending)');
+                }
+            } catch (error) {
+                console.log('🔇 Web Audio playback failed:', error);
+            }
+        }
+        
+        // Try to initialize Web Audio API first
+        if (initWebAudio()) {
+            isAudioEnabled = true;
+            return playWebAudio;
+        } else {
+            // Fallback to HTML5 Audio
+            console.log('🔄 Falling back to HTML5 Audio...');
+            return createHTML5Audio();
+        }
+    }
+
+    // Add engagement cues
+    function addEngagementCues() {
+        const button = document.getElementById('nexus-widget-button');
+        
+        // Add click handler to enable audio (required by browser autoplay policies)
+        button.addEventListener('click', () => {
+            console.log('🔊 User interaction detected - audio should now be enabled');
+        }, { once: true });
+        
+        // Initial attention cue after page load - MORE AGGRESSIVE
+        setTimeout(() => {
+            if (!hasInteracted && !isOpen) {
+                console.log('🎯 Starting ENHANCED engagement cues sequence...');
+                
+                // Add intense glow with scaling
+                if (config.enableGlow) {
+                    button.classList.add('nexus-glowing');
+                    console.log('✨ Enhanced glow effect added');
+                }
+                
+                // Add urgent pulse animation
+                if (config.enablePulse) {
+                    button.classList.add('nexus-pulsing');
+                    console.log('💓 Urgent pulse animation added');
+                }
+                
+                // Add attention ring effect
+                setTimeout(() => {
+                    button.classList.add('nexus-attention-ring');
+                    console.log('💫 Attention ring effect added');
+                }, 200);
+                
+                // Play sophisticated message sound
+                setTimeout(() => {
+                    console.log('🔔 Attempting to play SOPHISTICATED notification sound...');
+                    if (playNotificationSound) {
+                        playNotificationSound();
+                    } else {
+                        console.log('🔇 No sound function available');
+                    }
+                }, 600); // Slightly delayed for better timing with visuals
+                
+                // Add enhanced notification dot
+                setTimeout(() => {
+                    addNotificationDot();
+                    console.log('🔴 Enhanced notification dot added');
+                }, 1200);
+            }
+        }, config.initialDelay);
+        
+        // Set up enhanced reminder system
+        startReminderSystem();
+    }
+
+    // Add notification dot
+    function addNotificationDot() {
+        const button = document.getElementById('nexus-widget-button');
+        const existingDot = button.querySelector('.nexus-notification-dot');
+        
+        if (!existingDot && !hasInteracted) {
+            const dot = document.createElement('div');
+            dot.className = 'nexus-notification-dot';
+            button.appendChild(dot);
+        }
+    }
+
+    // Remove notification dot
+    function removeNotificationDot() {
+        const button = document.getElementById('nexus-widget-button');
+        const dot = button.querySelector('.nexus-notification-dot');
+        if (dot) {
+            dot.remove();
+        }
+    }
+
+    // Start reminder system with enhanced effects
+    function startReminderSystem() {
+        reminderTimer = setInterval(() => {
+            if (!hasInteracted && !isOpen && reminderCount < config.maxReminders) {
+                const button = document.getElementById('nexus-widget-button');
+                
+                // Enhanced bounce animation with attention ring
+                button.classList.add('nexus-bouncing');
+                setTimeout(() => {
+                    button.classList.remove('nexus-bouncing');
+                }, 2400); // Longer for 3 bounces
+                
+                // Add attention ring for reminders
+                button.classList.add('nexus-attention-ring');
+                setTimeout(() => {
+                    button.classList.remove('nexus-attention-ring');
+                }, 2000);
+                
+                // Sophisticated sound reminder
+                setTimeout(() => {
+                    if (playNotificationSound) {
+                        console.log('🔔 Playing reminder notification...');
+                        playNotificationSound();
+                    }
+                }, 400);
+                
+                reminderCount++;
+                
+                // Add notification dot if not present
+                setTimeout(() => {
+                    addNotificationDot();
+                }, 800);
+                
+            } else if (reminderCount >= config.maxReminders) {
+                clearInterval(reminderTimer);
+                console.log('🎯 Maximum reminders reached, stopping engagement cues');
+            }
+        }, config.reminderInterval);
+    }
+
+    // Clear all engagement cues
+    function clearEngagementCues() {
+        const button = document.getElementById('nexus-widget-button');
+        if (button) {
+            button.classList.remove('nexus-glowing', 'nexus-pulsing', 'nexus-bouncing', 'nexus-attention-ring');
+            removeNotificationDot();
+        }
+        
+        if (reminderTimer) {
+            clearInterval(reminderTimer);
+        }
+        
+        hasInteracted = true;
+        console.log('🎯 All engagement cues cleared - user has interacted');
     }
 
     // Create widget HTML
@@ -300,20 +817,8 @@
         const widget = document.createElement('div');
         widget.id = 'nexus-widget-container';
         widget.innerHTML = `
-            <div id="nexus-widget-button" style="
-                position: fixed;
+            <div id="nexus-widget-button" class="nx-chat-button" style="
                 ${config.position === 'bottom-right' ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'}
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                background: var(--nx-brand-red); /* Use brand solid red */
-                color: ${config.textColor};
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-                z-index: 9999;
             ">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -362,6 +867,9 @@
         deviceId = localStorage.getItem('nexus_device_id') || generateDeviceId();
         localStorage.setItem('nexus_device_id', deviceId);
 
+        // Create notification sound function
+        playNotificationSound = createNotificationSound();
+
         // Create widget HTML
         createWidgetHTML();
 
@@ -387,8 +895,16 @@
             }
         });
 
-        // Session is initialized when the widget is opened.
+        // Track interactions for engagement cues
+        chatButton.addEventListener('mouseenter', () => {
+            if (!hasInteracted) {
+                clearEngagementCues();
+            }
+        });
+
+        // Enable resizing and start engagement cues
         enableResizing();
+        addEngagementCues();
     }
 
     async function endChat() {
@@ -408,7 +924,6 @@
                     throw new Error('Failed to end the chat. Please try again.');
                 }
                 
-                // The WebSocket message 'thread_status_update' will handle the UI changes.
                 console.log('Chat successfully marked as resolved.');
 
             } catch (error) {
@@ -425,17 +940,32 @@
         
         isOpen = !isOpen;
         
+        // Clear engagement cues when opened
+        if (isOpen) {
+            clearEngagementCues();
+        }
+        
         if (isOpen) {
             chat.classList.remove('nx-hidden');
+            chat.classList.add('nx-chat--open');
             button.style.display = 'none';
             
             // Initialize connection if not already done
             if (!threadId) {
                 initializeSessionAndThread();
             }
+            
+            // Focus input when opened
+            setTimeout(() => {
+                document.getElementById('nexus-widget-message-input').focus();
+            }, 300);
         } else {
-            chat.classList.add('nx-hidden');
-            button.style.display = 'flex';
+            chat.classList.remove('nx-chat--open');
+            
+            setTimeout(() => {
+                chat.classList.add('nx-hidden');
+                button.style.display = 'flex';
+            }, 300);
         }
     }
 
@@ -466,7 +996,6 @@
             const newWidth = initialWidth - dx;
             const newHeight = initialHeight - dy;
     
-            // Using computed style for robustness against CSS unit changes
             const style = window.getComputedStyle(chatContainer);
             const minWidth = parseFloat(style.minWidth);
             const minHeight = parseFloat(style.minHeight);
@@ -491,29 +1020,24 @@
 
     async function initializeSessionAndThread() {
         try {
-            // Check if we have a stored thread ID that's still valid
             const storedThreadId = localStorage.getItem('nexus_thread_id');
             if (storedThreadId) {
                 threadId = storedThreadId;
                 console.log('🔄 Using stored thread:', threadId);
                 
-                // Try to fetch existing messages to validate thread
                 const success = await fetchAndRenderMessages(true);
                 if (success) {
                     console.log('✅ Stored thread is valid, setting up connections');
 
-                    // If the thread is valid but empty, show the welcome message
                     if (messagesContainer && messagesContainer.children.length === 0) {
                         console.log('Thread is empty. Adding welcome message.');
                         addMessageSafely('assistant', 'Welcome to NexusTours! How can I assist you today?', null, 'msg_welcome');
                     }
 
-                    // Thread is valid, set up real-time communication with delay
                     setTimeout(() => {
                         connectWebSocket();
                     }, 500);
                     
-                    // Also start polling as backup after WebSocket attempt
                     setTimeout(() => {
                         if (!socket || socket.readyState !== WebSocket.OPEN) {
                             console.log('🔄 WebSocket not connected, starting polling backup');
@@ -530,7 +1054,6 @@
 
             console.log('🆕 Creating new session and thread...');
             
-            // Create new session and thread
             const sessionResponse = await fetch(`${config.apiUrl}/users/identify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -558,7 +1081,6 @@
             }
             
             const threadData = await threadResponse.json();
-            // Support both `thread_id` and `id` field names from the API
             threadId = threadData.thread_id || threadData.id;
 
             if (threadId) {
@@ -566,20 +1088,18 @@
                 console.log('✅ New thread created:', threadId);
                 addMessageSafely('assistant', 'Welcome to NexusTours! How can I assist you today?', null, 'msg_welcome');
                 
-                // Give server time to fully process the thread creation
                 console.log('⏳ Waiting for server to process thread creation...');
                 setTimeout(() => {
                     console.log('🔌 Attempting WebSocket connection to thread:', threadId);
                     connectWebSocket();
-                }, 1000); // Increased delay to ensure server processing
+                }, 1000);
                 
-                // Start polling as backup after giving WebSocket time to connect
                 setTimeout(() => {
                     if (!socket || socket.readyState !== WebSocket.OPEN) {
                         console.log('🔄 WebSocket not ready, starting polling backup');
                         startPolling();
                     }
-                }, 4000); // Increased delay
+                }, 4000);
             } else {
                 throw new Error('Thread ID not received from server');
             }
@@ -595,7 +1115,6 @@
             
             addMessageSafely('system', 'Sorry, we are unable to connect to customer support at the moment. Please try refreshing the page.');
             
-            // Start polling as fallback even on error if we have a threadId
             if (threadId) {
                 console.log('🔄 Starting polling as fallback for thread:', threadId);
                 startPolling();
@@ -605,23 +1124,14 @@
 
     /**
      * Parses Markdown text into safe HTML using marked.js and DOMPurify.
-     * @param {string} text The markdown text to parse.
-     * @returns {string} The safe HTML string.
      */
     function parseMarkdown(text) {
         if (!text || typeof marked === 'undefined' || typeof DOMPurify === 'undefined') {
-            // Fallback for safety or if libraries haven't loaded yet
             return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
         
-        // 1. Convert Markdown to HTML using marked.js
-        // gfm: true -> Enables GitHub Flavored Markdown (better lists, tables, etc.)
-        // breaks: true -> Treats single newlines in paragraphs as <br> tags
         const dirtyHtml = marked.parse(text, { gfm: true, breaks: true });
-
-        // 2. Sanitize the HTML to prevent XSS attacks using DOMPurify
         const cleanHtml = DOMPurify.sanitize(dirtyHtml);
-
         return cleanHtml;
     }
 
@@ -680,21 +1190,14 @@
             const timeElement = document.createElement('span');
             timeElement.className = 'nx-msg__meta';
             try {
-                // FIX V2: Ensure all timestamps are treated as UTC before display.
-                // The server might send UTC timestamps in a format that browsers
-                // interpret as local time (e.g., 'YYYY-MM-DD HH:MM:SS').
-                // This standardizes the timestamp to an ISO string with a 'Z' for UTC.
                 let date;
                 if (typeof timestamp === 'string' && !timestamp.toLowerCase().endsWith('z') && !/[+-]\d{2}(:?\d{2})?$/.test(timestamp)) {
-                    // If no timezone is specified, assume UTC.
-                    // Replace space with 'T' and append 'Z' for ISO 8601 compliance.
                     const isoTimestamp = timestamp.trim().replace(' ', 'T') + 'Z';
                     date = new Date(isoTimestamp);
                 } else {
                     date = new Date(timestamp);
                 }
                 
-                // Check if the date is valid before trying to format it
                 if (!isNaN(date.getTime())) {
                     timeElement.textContent = date.toLocaleTimeString([], { 
                         hour: '2-digit', 
@@ -736,12 +1239,10 @@
     }
 
     function handleClosedConversation() {
-        // Erase session data so a new chat starts on reload
         localStorage.removeItem('nexus_thread_id');
         threadId = null;
         cleanupConnections();
 
-        // Just disable the input, keeping the conversation visible.
         const messageInput = document.getElementById('nexus-widget-message-input');
         if (messageInput) {
             messageInput.disabled = true;
@@ -780,14 +1281,13 @@
                 messageCount: data.messages ? data.messages.length : 0,
                 threadId: threadId,
                 hasMessages: data.messages && Array.isArray(data.messages),
-                threadStatus: data.thread_status // Log status for debugging
+                threadStatus: data.thread_status
             });
 
-            // Handle closed thread
             if (data.thread_status === 'closed') {
                 console.log('🔒 Thread is closed, starting graceful shutdown of conversation.');
                 handleClosedConversation();
-                return false; // Stop further processing
+                return false;
             }
             
             if (data.messages && Array.isArray(data.messages)) {
@@ -818,12 +1318,10 @@
         let hasNewMessages = false;
 
         messages.forEach(msg => {
-            // Remove any matching temporary messages first
             if (msg.sender_type === 'customer') {
                 removeTempMessage(msg.content, msg.sender_type);
             }
 
-            // Add message if not already displayed
             const added = addMessageSafely(msg.sender_type, msg.content, msg.created_at, msg.id);
             if (added) {
                 hasNewMessages = true;
@@ -841,15 +1339,13 @@
             return;
         }
         
-        // Clean up existing connection
         if (socket) {
             console.log('🧹 Cleaning up existing WebSocket connection');
-            socket.onclose = null; // Prevent reconnection attempts
+            socket.onclose = null;
             socket.close();
             socket = null;
         }
 
-        // Clear any existing reconnect timer
         if (wsReconnectTimer) {
             clearTimeout(wsReconnectTimer);
             wsReconnectTimer = null;
@@ -870,27 +1366,25 @@
             
             socket = new WebSocket(wsUrl);
             
-            // Set connection timeout
             const connectionTimeout = setTimeout(() => {
                 if (socket && socket.readyState === WebSocket.CONNECTING) {
                     console.log('⏰ WebSocket connection timeout after 15 seconds');
                     socket.close();
                     handleWebSocketReconnect();
                 }
-            }, 15000); // Increased timeout to 15 seconds
+            }, 15000);
 
             socket.onopen = () => {
                 clearTimeout(connectionTimeout);
                 console.log('✅ WebSocket connected successfully to thread:', threadId);
-                stopPolling(); // Stop polling as WebSocket is now connected
+                stopPolling();
                 console.log('🔗 WebSocket state:', {
                     readyState: socket.readyState,
                     url: socket.url,
                     protocol: socket.protocol
                 });
-                wsReconnectAttempts = 0; // Reset on successful connection
+                wsReconnectAttempts = 0;
                 
-                // Send a connection confirmation message
                 try {
                     socket.send(JSON.stringify({ 
                         type: 'connect', 
@@ -902,7 +1396,6 @@
                     console.error('❌ Error sending connection confirmation:', e);
                 }
                 
-                // Start heartbeat to keep connection alive
                 startHeartbeat();
             };
             
@@ -916,7 +1409,6 @@
                     threadId: threadId
                 });
                 
-                // Only attempt reconnection if not manually closed
                 if (event.code !== 1000 && event.code !== 1001) {
                     handleWebSocketReconnect();
                 }
@@ -943,22 +1435,18 @@
                 try {
                     const msg = JSON.parse(event.data);
                     
-                    // Handle heartbeat pong
                     if (msg.type === 'pong') {
                         console.log('💓 Heartbeat pong received');
                         return;
                     }
 
-                    // Handle thread status updates
                     if (msg.type === 'thread_status_update' && msg.status === 'closed') {
                         console.log('🔒 Thread closed via WebSocket. Starting graceful shutdown.');
                         handleClosedConversation();
                         return;
                     }
                     
-                    // Handle regular messages
                     if (msg.id && msg.content) {
-                        // If the message is from the user, remove the temporary optimistic message first
                         if (msg.sender_type === 'customer' || msg.sender_type === 'user') {
                             removeTempMessage(msg.content, msg.sender_type);
                         }
@@ -988,13 +1476,135 @@
         }
     }
 
+    async function sendMessage() {
+        const input = document.getElementById('nexus-widget-message-input');
+        const content = input.value.trim();
+        if (!content) return;
+
+        // Clear engagement cues on first message
+        if (!hasInteracted) {
+            clearEngagementCues();
+        }
+
+        let tempMessageId;
+        
+        try {
+            if (!threadId) {
+                console.log('✉️ No thread found, creating a new one...');
+                await initializeSessionAndThread();
+
+                if (!threadId) {
+                    throw new Error("Failed to create a new session. Please refresh.");
+                }
+                console.log('✅ New thread created by sendMessage, proceeding to send message.');
+            }
+
+            tempMessageId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const timestamp = new Date().toISOString();
+            
+            addMessageSafely('customer', content, timestamp, tempMessageId);
+            input.value = '';
+            input.placeholder = 'Type your message...';
+
+            const response = await fetch(`${config.apiUrl}/threads/${threadId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ content: content })
+            });
+
+            if (!response.ok) throw new Error(`Message send failed: ${response.status}`);
+
+            console.log('Message sent successfully to thread:', threadId);
+
+        } catch (error) {
+            console.error('Error sending message:', error);
+            addMessageSafely('assistant', error.message || 'Failed to send message.');
+            
+            // Remove temporary message on error
+            if (tempMessageId) {
+                const tempMessageElement = document.querySelector(`[data-message-id="${tempMessageId}"]`);
+                if (tempMessageElement) {
+                    displayedMessages.delete(tempMessageId);
+                    tempMessageElement.remove();
+                }
+            }
+        }
+    }
+
+    // Legacy function for backward compatibility
+    function addMessageToUI(role, content, timestamp, messageId) {
+        return addMessageSafely(role, content, timestamp, messageId);
+    }
+
+    // Expose the widget to the global scope
+    window.NexusWidget = {
+        init: function(config) {
+            const defaultConfig = {
+                apiUrl: 'http://localhost:5000/api',
+                companyName: 'NexusTours',
+                primaryColor: '#E73A4E',
+                textColor: '#FFFFFF',
+                position: 'bottom-right',
+                enableGlow: true,
+                enableSound: true,
+                enablePulse: true,
+                initialDelay: 3000,
+                reminderInterval: 45000,
+                maxReminders: 3
+            };
+
+            const mergedConfig = { ...defaultConfig, ...config };
+            initWidget(mergedConfig);
+        },
+        // Allow customers to control engagement features
+        enableEngagement: function(enabled) {
+            config.enableGlow = enabled;
+            config.enableSound = enabled;
+            config.enablePulse = enabled;
+        },
+        clearCues: clearEngagementCues,
+        // Add debug method for audio testing
+        testAudio: function() {
+            console.log('🔊 Testing audio manually...');
+            console.log('Audio config enabled:', config.enableSound);
+            console.log('Audio function available:', !!playNotificationSound);
+            if (playNotificationSound) {
+                playNotificationSound();
+                console.log('🔔 Audio test function called');
+            } else {
+                console.log('🔇 No audio function to test');
+            }
+        }
+    };
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        console.log('🧹 Cleaning up widget connections');
+        cleanupConnections();
+        clearEngagementCues();
+    });
+
+    // Cleanup on page visibility change (mobile browsers)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            console.log('🔇 Page hidden, pausing connections');
+            stopHeartbeat();
+        } else {
+            console.log('👁️ Page visible, resuming connections');
+            if (typeof socket !== 'undefined' && socket && socket.readyState === WebSocket.OPEN) {
+                startHeartbeat();
+            } else if (threadId) {
+                connectWebSocket();
+            }
+        }
+    });
+
     function handleWebSocketReconnect() {
         if (!isWebSocketEnabled || wsReconnectAttempts >= maxReconnectAttempts) {
             console.log('❌ WebSocket max reconnection attempts reached, falling back to polling');
             isWebSocketEnabled = false;
             socket = null;
             
-            // Ensure polling is active as fallback
             if (!pollingTimer) {
                 startPolling();
             }
@@ -1002,7 +1612,7 @@
         }
 
         wsReconnectAttempts++;
-        const delay = Math.min(1000 * Math.pow(2, wsReconnectAttempts), 30000); // Exponential backoff, max 30s
+        const delay = Math.min(1000 * Math.pow(2, wsReconnectAttempts), 30000);
         
         console.log(`🔄 Attempting WebSocket reconnection in ${delay}ms (attempt ${wsReconnectAttempts}/${maxReconnectAttempts})`);
         
@@ -1012,7 +1622,7 @@
     }
 
     function startHeartbeat() {
-        stopHeartbeat(); // Clear any existing heartbeat
+        stopHeartbeat();
         
         heartbeatInterval = setInterval(() => {
             if (socket && socket.readyState === WebSocket.OPEN) {
@@ -1026,7 +1636,7 @@
             } else {
                 stopHeartbeat();
             }
-        }, 30000); // Send heartbeat every 30 seconds
+        }, 30000);
     }
 
     function stopHeartbeat() {
@@ -1064,14 +1674,12 @@
     }
 
     function cleanupConnections() {
-        // Clean up WebSocket
         if (socket) {
-            socket.onclose = null; // Prevent reconnection attempts
+            socket.onclose = null;
             socket.close();
             socket = null;
         }
         
-        // Clear timers
         if (wsReconnectTimer) {
             clearTimeout(wsReconnectTimer);
             wsReconnectTimer = null;
@@ -1080,102 +1688,4 @@
         stopHeartbeat();
         stopPolling();
     }
-
-    async function sendMessage() {
-        const input = document.getElementById('nexus-widget-message-input');
-        const content = input.value.trim();
-        if (!content) return;
-
-        try {
-            // If there's no thread, create one first. This will show the welcome message.
-            if (!threadId) {
-                console.log('✉️ No thread found, creating a new one...');
-                // This will add a welcome message.
-                await initializeSessionAndThread(); 
-
-                if (!threadId) {
-                    // It failed.
-                    throw new Error("Failed to create a new session. Please refresh.");
-                }
-                console.log('✅ New thread created by sendMessage, proceeding to send message.');
-            }
-
-            const tempMessageId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            const timestamp = new Date().toISOString();
-            
-            // Add user message to UI after potential thread creation
-            addMessageSafely('customer', content, timestamp, tempMessageId);
-            input.value = '';
-            input.placeholder = 'Type your message...'; // Reset placeholder
-
-            const response = await fetch(`${config.apiUrl}/threads/${threadId}/messages`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ content: content })
-            });
-
-            if (!response.ok) throw new Error(`Message send failed: ${response.status}`);
-
-            // This prevents the race condition causing duplicates
-            console.log('Message sent successfully to thread:', threadId);
-
-        } catch (error) {
-            console.error('Error sending message:', error);
-            addMessageSafely('assistant', error.message || 'Failed to send message.');
-            
-            // Remove temporary message on error
-            const tempMessageElement = document.querySelector(`[data-message-id="${tempMessageId}"]`);
-            if (tempMessageElement) {
-                displayedMessages.delete(tempMessageId);
-                tempMessageElement.remove();
-            }
-        }
-    }
-
-    // Legacy function for backward compatibility
-    function addMessageToUI(role, content, timestamp, messageId) {
-        return addMessageSafely(role, content, timestamp, messageId);
-    }
-
-    // Expose the widget to the global scope
-    window.NexusWidget = {
-        init: function(config) {
-            // Merge default config with provided config
-            const defaultConfig = {
-                apiUrl: 'http://localhost:5000/api',
-                companyName: 'NexusTours',
-                primaryColor: '#FD921E',
-                textColor: '#FFFFFF',
-                position: 'bottom-right'
-            };
-
-            // Merge configs
-            const mergedConfig = { ...defaultConfig, ...config };
-            
-            // Initialize the widget
-            initWidget(mergedConfig);
-        }
-    };
-
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-        console.log('🧹 Cleaning up widget connections');
-        cleanupConnections();
-    });
-
-    // Cleanup on page visibility change (mobile browsers)
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            console.log('🔇 Page hidden, pausing connections');
-            // Don't fully cleanup, just pause heartbeat
-            stopHeartbeat();
-        } else {
-            console.log('👁️ Page visible, resuming connections');
-            if (typeof socket !== 'undefined' && socket && socket.readyState === WebSocket.OPEN) {
-                startHeartbeat();
-            } else if (threadId) {
-                connectWebSocket();
-            }
-        }
-    });
 })();
