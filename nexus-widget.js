@@ -20,6 +20,20 @@
   --nx-gray-700:   #646464;
   --nx-text-900:   #575756;
 
+  /* Themeable variables */
+  --nx-button-bg: var(--nx-brand-red);
+  --nx-button-border-color: transparent;
+  --nx-button-icon-color: #FFFFFF;
+  --nx-notification-dot-bg: var(--nx-brand-red);
+  --nx-header-bg: var(--nx-grad-primary);
+  --nx-agent-bubble-bg: #FFFFFF;
+  --nx-agent-bubble-border-color: var(--nx-gray-300);
+  --nx-user-bubble-bg: var(--nx-orange-500);
+  --nx-user-bubble-border-color: transparent;
+  --nx-send-button-bg: var(--nx-orange-500);
+  --nx-send-button-border-color: transparent;
+  --nx-send-button-icon-color: #FFFFFF;
+
   /* Gradient */
   --nx-grad-primary: linear-gradient(90deg,#E73A4E 0%,#FF621D 100%);
 
@@ -67,7 +81,7 @@
 /* 3. Header */
 .nx-chat__header {
   padding: var(--nx-space-3) var(--nx-space-4);
-  background: var(--nx-grad-primary);
+  background: var(--nx-header-bg);
   color: #fff;
   font: 700 1.125rem/1 var(--nx-font-main);
   display: flex;
@@ -107,12 +121,13 @@
   word-break: break-word;
 }
 .nx-msg--agent {
-  background: #fff;
-  border: 1px solid var(--nx-gray-300);
+  background: var(--nx-agent-bubble-bg);
+  border: 1px solid var(--nx-agent-bubble-border-color);
   align-self: flex-start;
 }
 .nx-msg--user {
-  background: var(--nx-orange-500);
+  background: var(--nx-user-bubble-bg);
+  border: 1px solid var(--nx-user-bubble-border-color);
   color: #fff;
   align-self: flex-end;
 }
@@ -163,8 +178,8 @@
   justify-content: center;
   width: 2.75rem;
   height: 2.75rem;
-  background: var(--nx-orange-500);
-  border: none;
+  background: var(--nx-send-button-bg);
+  border: 1px solid var(--nx-send-button-border-color);
   border-radius: 50%;
   cursor: pointer;
   transition: background .25s ease, transform .2s ease;
@@ -174,7 +189,7 @@
   height: 1.25rem;
 }
 .nx-chat__send svg path {
-  stroke: #fff; /* Ensure path stroke is white */
+  stroke: var(--nx-send-button-icon-color); /* Ensure path stroke is white */
 }
 .nx-chat__send:hover   { background: var(--nx-orange-600); transform: translateY(-2px); }
 .nx-chat__send:active  { background: var(--nx-orange-700); transform: translateY( 0); }
@@ -358,7 +373,7 @@
     right: -4px;
     width: 14px; /* Slightly larger */
     height: 14px;
-    background: #ff4757;
+    background: var(--nx-notification-dot-bg);
     border-radius: 50%;
     border: 2px solid white;
     animation: nexus-notification-dot-urgent 0.5s ease-out;
@@ -371,8 +386,9 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: var(--nx-brand-red);
-    color: #fff;
+    background: var(--nx-button-bg);
+    border: 1px solid var(--nx-button-border-color);
+    color: var(--nx-button-icon-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -388,22 +404,46 @@
 }
 `;
 
-    // Widget configuration
+    // Widget configuration - Predefined for web channel
     const config = {
         position: 'bottom-right',
         primaryColor: '#E73A4E',
         textColor: '#ffffff',
         companyName: 'NexusTours',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        welcomeMessage: 'Welcome to NexusTours! How can I assist you today?',
+        apiUrl: 'https://nexus-development.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
+        channel: 'nexustours-web', // Predefined web channel identifier
         // Engagement settings
         enableGlow: true,
         enableSound: true,
         enablePulse: true,
         initialDelay: 3000,
         reminderInterval: 45000,
-        maxReminders: 3
+        maxReminders: 3,
+        // Predefined theme for web channel
+        theme: {
+            // Chat Button (Icono)
+            '--nx-button-bg': 'var(--nx-brand-red)',
+            '--nx-button-icon-color': '#FFFFFF',
+
+            // Notification Dot (Notificacion)
+            '--nx-notification-dot-bg': 'var(--nx-brand-red)',
+
+            // Chat Header (Top chat)
+            '--nx-header-bg': 'var(--nx-grad-primary)',
+
+            // Message Bubbles (Cuadros)
+            '--nx-agent-bubble-bg': '#FFFFFF',
+            '--nx-agent-bubble-border-color': 'var(--nx-gray-300)',
+            '--nx-user-bubble-bg': 'var(--nx-orange-500)',
+            '--nx-user-bubble-border-color': 'transparent',
+
+            // Send Button (Boton ok)
+            '--nx-send-button-bg': 'var(--nx-orange-500)',
+            '--nx-send-button-icon-color': '#FFFFFF'
+        }
     };
 
     // Widget state
@@ -411,6 +451,7 @@
     let sessionId = null;
     let deviceId = null;
     let threadId = null;
+    let isInitializing = false;
     let pollingTimer = null;
     let socket = null;
     let displayedMessages;
@@ -420,12 +461,26 @@
     let wsReconnectTimer = null;
     let isWebSocketEnabled = true;
     let heartbeatInterval = null;
+    let isConversationClosed = false; // Track if conversation is closed
     
     // Engagement state
     let hasInteracted = false;
     let reminderCount = 0;
     let reminderTimer = null;
     let playNotificationSound = null;
+
+    // Apply custom theme from config
+    function applyTheme(theme) {
+        const chatContainer = document.getElementById('nexus-widget-chat');
+        if (chatContainer && theme) {
+            for (const [key, value] of Object.entries(theme)) {
+                // Ensure the key is a valid CSS custom property name
+                if (key.startsWith('--')) {
+                    chatContainer.style.setProperty(key, value);
+                }
+            }
+        }
+    }
 
     // Generate a unique device ID
     function generateDeviceId() {
@@ -830,7 +885,7 @@
                     <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    <span>NexusTours</span>
+                    <span>${config.companyName}</span>
                     <button id="nexus-widget-close" style="margin-left:auto;background:none;border:none;color:#fff;cursor:pointer;font-size:1.25rem;line-height:1;">&times;</button>
                 </div>
                 <div class="nx-chat__body" id="nexus-widget-messages"></div>
@@ -866,12 +921,18 @@
         // Generate or retrieve device ID
         deviceId = localStorage.getItem('nexus_device_id') || generateDeviceId();
         localStorage.setItem('nexus_device_id', deviceId);
+        
+        // Reset conversation state
+        isConversationClosed = false;
 
         // Create notification sound function
         playNotificationSound = createNotificationSound();
 
         // Create widget HTML
         createWidgetHTML();
+
+        // Apply theme right after creating the HTML
+        applyTheme(config.theme);
 
         // Initialize messages container reference
         messagesContainer = document.getElementById('nexus-widget-messages');
@@ -915,7 +976,7 @@
 
         if (confirm('Are you sure you want to end this chat?')) {
             try {
-                const response = await fetch(`${config.apiUrl}/threads/${threadId}/resolve`, {
+                const response = await fetch(`${config.apiUrl}/widget/threads/${threadId}/resolve`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                 });
@@ -950,9 +1011,12 @@
             chat.classList.add('nx-chat--open');
             button.style.display = 'none';
             
-            // Initialize connection if not already done
-            if (!threadId) {
-                initializeSessionAndThread();
+            // Initialize connection IF a thread already exists, but DO NOT create a new one.
+            if (localStorage.getItem('nexus_thread_id') && !threadId) {
+                initializeSessionAndThread(false); // Pass false to prevent creation
+            } else if (!threadId && messagesContainer && messagesContainer.children.length === 0) {
+                // Only show welcome message if there are no messages and no thread
+                addMessageSafely('assistant', config.welcomeMessage, null, 'msg_welcome');
             }
             
             // Focus input when opened
@@ -1018,7 +1082,14 @@
         resizeHandle.addEventListener('mousedown', onMouseDown);
     }
 
-    async function initializeSessionAndThread() {
+    async function initializeSessionAndThread(createIfNotFound = true) {
+        if (isInitializing) {
+            console.log('🔄 Initialization already in progress. Waiting for it to complete.');
+            return;
+        }
+        isInitializing = true;
+        console.log('🚀 Starting session and thread initialization...');
+
         try {
             const storedThreadId = localStorage.getItem('nexus_thread_id');
             if (storedThreadId) {
@@ -1029,9 +1100,10 @@
                 if (success) {
                     console.log('✅ Stored thread is valid, setting up connections');
 
+                    // Only add welcome message if thread is empty and not closed
                     if (messagesContainer && messagesContainer.children.length === 0) {
                         console.log('Thread is empty. Adding welcome message.');
-                        addMessageSafely('assistant', 'Welcome to NexusTours! How can I assist you today?', null, 'msg_welcome');
+                        addMessageSafely('assistant', config.welcomeMessage, null, 'msg_welcome');
                     }
 
                     setTimeout(() => {
@@ -1046,12 +1118,19 @@
                     }, 3000);
                     return;
                 } else {
-                    console.log('❌ Stored thread is invalid, removing from storage');
+                    console.log('❌ Stored thread is invalid or closed, removing from storage');
                     localStorage.removeItem('nexus_thread_id');
                     threadId = null;
+                    // Don't add welcome message here - let toggleWidget handle it
                 }
             }
 
+            if (!createIfNotFound) {
+                console.log('🛑 Creation of new thread is disabled for this call.');
+                addMessageSafely('assistant', config.welcomeMessage, null, 'msg_welcome');
+                return;
+            }
+            
             console.log('🆕 Creating new session and thread...');
             
             const sessionResponse = await fetch(`${config.apiUrl}/users/identify`, {
@@ -1069,10 +1148,13 @@
             sessionId = sessionData.session_id;
             console.log('✅ Session created:', sessionId);
 
-            const threadResponse = await fetch(`${config.apiUrl}/threads`, {
+            const threadResponse = await fetch(`${config.apiUrl}/threads/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ session_id: sessionId })
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    channel: config.channel // Pass the configured channel
+                })
             });
 
             if (!threadResponse.ok) {
@@ -1085,8 +1167,8 @@
 
             if (threadId) {
                 localStorage.setItem('nexus_thread_id', threadId);
+                isConversationClosed = false; // Reset the flag for new conversation
                 console.log('✅ New thread created:', threadId);
-                addMessageSafely('assistant', 'Welcome to NexusTours! How can I assist you today?', null, 'msg_welcome');
                 
                 console.log('⏳ Waiting for server to process thread creation...');
                 setTimeout(() => {
@@ -1119,6 +1201,9 @@
                 console.log('🔄 Starting polling as fallback for thread:', threadId);
                 startPolling();
             }
+        } finally {
+            isInitializing = false;
+            console.log('🏁 Session and thread initialization finished.');
         }
     }
 
@@ -1241,22 +1326,32 @@
     function handleClosedConversation() {
         localStorage.removeItem('nexus_thread_id');
         threadId = null;
+        isConversationClosed = false; // Reset flag to allow new conversation
         cleanupConnections();
 
+        // Clear all messages and prepare for new conversation
+        if (messagesContainer) {
+            messagesContainer.innerHTML = '';
+        }
+
+        // Re-enable input for new conversation
         const messageInput = document.getElementById('nexus-widget-message-input');
         if (messageInput) {
-            messageInput.disabled = true;
-            messageInput.placeholder = 'This conversation is closed.';
+            messageInput.disabled = false;
+            messageInput.placeholder = 'Type your message...';
         }
         const sendButton = document.getElementById('nexus-widget-send');
-        if (sendButton) sendButton.disabled = true;
+        if (sendButton) sendButton.disabled = false;
         
         const endChatContainer = document.getElementById('nexus-widget-end-chat-container');
         if (endChatContainer) {
-            endChatContainer.style.display = 'none';
+            endChatContainer.style.display = 'block';
         }
 
-        console.log('Conversation closed. Input disabled, history preserved until page reload.');
+        // Add welcome message for new conversation
+        addMessageSafely('assistant', config.welcomeMessage, null, 'msg_welcome');
+
+        console.log('Conversation closed. Ready for new conversation.');
     }
 
     async function fetchAndRenderMessages(suppressErrorOnUI = false) {
@@ -1266,7 +1361,7 @@
         }
         
         try {
-            const url = `${config.apiUrl}/threads/${threadId}/messages`;
+            const url = `${config.apiUrl}/widget/threads/${threadId}/messages`;
             console.log('📡 Fetching messages from:', url);
             
             const response = await fetch(url);
@@ -1486,12 +1581,17 @@
             clearEngagementCues();
         }
 
-        let tempMessageId;
+        // Optimistically add the message to the UI for a responsive feel
+        const tempMessageId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const timestamp = new Date().toISOString();
+        addMessageSafely('customer', content, timestamp, tempMessageId);
+        input.value = '';
+        input.placeholder = 'Type your message...';
         
         try {
             if (!threadId) {
                 console.log('✉️ No thread found, creating a new one...');
-                await initializeSessionAndThread();
+                await initializeSessionAndThread(true); // Explicitly allow creation
 
                 if (!threadId) {
                     throw new Error("Failed to create a new session. Please refresh.");
@@ -1499,22 +1599,21 @@
                 console.log('✅ New thread created by sendMessage, proceeding to send message.');
             }
 
-            tempMessageId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            const timestamp = new Date().toISOString();
-            
-            addMessageSafely('customer', content, timestamp, tempMessageId);
-            input.value = '';
-            input.placeholder = 'Type your message...';
-
-            const response = await fetch(`${config.apiUrl}/threads/${threadId}/messages`, {
+            const response = await fetch(`${config.apiUrl}/widget/threads/${threadId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ content: content })
+                body: JSON.stringify({ 
+                    message: content  // The API expects 'message' field, not 'content'
+                })
             });
 
             if (!response.ok) throw new Error(`Message send failed: ${response.status}`);
 
-            console.log('Message sent successfully to thread:', threadId);
+            const responseData = await response.json();
+            console.log('Message sent successfully to thread:', threadId, responseData);
+            
+            // Don't add assistant response here - let WebSocket handle it
+            // This prevents duplicate messages
 
         } catch (error) {
             console.error('Error sending message:', error);
@@ -1538,22 +1637,15 @@
 
     // Expose the widget to the global scope
     window.NexusWidget = {
-        init: function(config) {
-            const defaultConfig = {
-                apiUrl: 'http://localhost:5000/api',
-                companyName: 'NexusTours',
-                primaryColor: '#E73A4E',
-                textColor: '#FFFFFF',
-                position: 'bottom-right',
-                enableGlow: true,
-                enableSound: true,
-                enablePulse: true,
-                initialDelay: 3000,
-                reminderInterval: 45000,
-                maxReminders: 3
-            };
-
-            const mergedConfig = { ...defaultConfig, ...config };
+        init: function(customConfig) {
+            // Use predefined config as base, then merge with any custom config provided
+            const mergedConfig = { ...config, ...customConfig };
+            
+            // If custom theme is provided, merge it with the predefined theme
+            if (customConfig && customConfig.theme) {
+                mergedConfig.theme = { ...config.theme, ...customConfig.theme };
+            }
+            
             initWidget(mergedConfig);
         },
         // Allow customers to control engagement features
