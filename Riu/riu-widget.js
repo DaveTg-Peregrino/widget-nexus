@@ -412,7 +412,7 @@
         textColor: '#ffffff',
         companyName: 'Riu',
         welcomeMessage: 'Welcome to Riu! How can I assist you today?',
-    apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'riu-web', // Predefined web channel identifier

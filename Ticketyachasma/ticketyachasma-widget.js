@@ -412,7 +412,7 @@
         textColor: '#ffffff',
         companyName: 'Ticketyachasma',
         welcomeMessage: 'Welcome to Ticketyachasma! How can I assist you today?',
-    apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'Ticketyachasma-web', // Predefined web channel identifier

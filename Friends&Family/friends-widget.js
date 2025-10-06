@@ -412,7 +412,7 @@
         textColor: '#ffffff',
         companyName: 'Friends&Family',
         welcomeMessage: 'Welcome to Friends&Family! How can I assist you today?',
-    apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'friends-web', // Predefined web channel identifier

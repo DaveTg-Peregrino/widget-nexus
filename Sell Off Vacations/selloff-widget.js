@@ -412,7 +412,7 @@
         textColor: '#ffffff',
         companyName: 'Sell Off Vacations',
         welcomeMessage: 'Welcome to Sell Off Vacations! How can I assist you today?',
-    apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'selloff-web', // Predefined web channel identifier

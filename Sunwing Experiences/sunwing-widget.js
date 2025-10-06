@@ -412,7 +412,7 @@
         textColor: '#ffffff',
         companyName: 'Sunwing Experiences',
         welcomeMessage: 'Welcome to Sunwing Experiences! How can I assist you today?',
-    apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'sunwing-web', // Predefined web channel identifier

@@ -412,7 +412,7 @@
         textColor: '#004A63',
         companyName: 'Royalton Groups',
         welcomeMessage: 'Welcome to Royalton Groups! How can I assist you today?',
-    apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'royaltongroup-web', // Predefined web channel identifier
