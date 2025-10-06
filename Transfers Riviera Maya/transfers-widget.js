@@ -412,7 +412,7 @@
         textColor: '#ffffff',
         companyName: 'Transfers Riviera Maya',
         welcomeMessage: 'Welcome to Transfers Riviera Maya! How can I assist you today?',
-        apiUrl: 'https://nexus-development-1.onrender.com',
+    apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'transfers-web', // Predefined web channel identifier

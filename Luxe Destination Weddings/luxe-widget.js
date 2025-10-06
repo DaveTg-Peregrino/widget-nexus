@@ -412,7 +412,7 @@
         textColor: '#ffffff',
         companyName: 'Luxe Destination Weddings',
         welcomeMessage: 'Welcome to Luxe Destination Weddings! How can I assist you today?',
-        apiUrl: 'https://nexus-development-1.onrender.com',
+    apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'luxe-web', // Predefined web channel identifier

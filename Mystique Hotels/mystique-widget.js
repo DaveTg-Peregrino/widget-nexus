@@ -412,7 +412,7 @@
         textColor: '#ffffff',
         companyName: 'Mystique Hotels',
         welcomeMessage: 'Welcome to Mystique Hotels! How can I assist you today?',
-        apiUrl: 'https://nexus-development-1.onrender.com',
+    apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'mystique-web', // Predefined web channel identifier

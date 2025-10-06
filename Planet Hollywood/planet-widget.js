@@ -411,7 +411,7 @@
         textColor: '#ffffff',
         companyName: 'Planet Hollywood',
         welcomeMessage: 'Welcome to Planet Hollywood! How can I assist you today?',
-        apiUrl: 'https://nexus-development-1.onrender.com',
+    apiUrl: 'https://nexus-staging-dupl.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'planet-web', // Predefined web channel identifier
