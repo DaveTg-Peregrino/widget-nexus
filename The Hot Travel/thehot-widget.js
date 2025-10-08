@@ -253,6 +253,17 @@
     text-decoration: underline;
 }
 
+/* Fix: Links in user bubbles need different color for visibility */
+.nx-msg--user a {
+    color: var(--nx-agent-bubble-bg); /* Use agent bubble background color (white) for contrast */
+    text-decoration: underline; /* Add underline to make it clear it's a link */
+}
+
+.nx-msg--user a:hover {
+    color: var(--nx-cyan-500); /* Cyan on hover for better UX */
+    text-decoration: underline;
+}
+
 .nx-msg strong {
     font-weight: 600;
 }
