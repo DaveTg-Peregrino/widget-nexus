@@ -423,7 +423,7 @@
         textColor: '#ffffff',
         companyName: 'Vacances West Jet Quebec',
         welcomeMessage: 'Welcome to Vacances West Jet Quebec! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'quebec-web', // Predefined web channel identifier

@@ -423,7 +423,7 @@
         textColor: '#ffffff',
         companyName: 'Iberostar',
         welcomeMessage: 'Welcome to Iberostar! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'iberostar-web', // Predefined web channel identifier

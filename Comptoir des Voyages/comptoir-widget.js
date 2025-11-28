@@ -423,7 +423,7 @@
         textColor: '#ffffff',
         companyName: 'Comptoir des Voyages',
         welcomeMessage: 'Welcome to Comptoir des Voyages! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'comptoir-web', // Predefined web channel identifier

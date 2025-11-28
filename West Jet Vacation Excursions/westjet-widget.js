@@ -422,7 +422,7 @@
         textColor: '#ffffff',
         companyName: 'WestJet Vacation Excursions',
         welcomeMessage: 'Welcome to WestJet Vacation Excursions! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'westjet-web', // Predefined web channel identifier

@@ -423,7 +423,7 @@
         textColor: '#ffffff',
         companyName: 'Vista Sol Punta Cana',
         welcomeMessage: 'Welcome to Vista Sol Punta Cana! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'vista-web', // Predefined web channel identifier

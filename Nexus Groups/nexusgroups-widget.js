@@ -423,7 +423,7 @@
         textColor: '#ffffff',
         companyName: 'Nexus Groups',
         welcomeMessage: 'Welcome to Nexus Groups! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'nexusgroups-web', // Predefined web channel identifier

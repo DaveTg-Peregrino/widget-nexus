@@ -423,7 +423,7 @@
         textColor: '#ffffff',
         companyName: 'Hype Travel (Groups)',
         welcomeMessage: 'Welcome to Hype Travel (Groups)! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'hype-web', // Predefined web channel identifier

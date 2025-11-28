@@ -423,7 +423,7 @@
         textColor: '#ffffff',
         companyName: 'Princess Hotels WHL',
         welcomeMessage: 'Welcome to Princess Hotels WHL! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'princess-web', // Predefined web channel identifier

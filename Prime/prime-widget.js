@@ -423,7 +423,7 @@
         textColor: '#ffffff',
         companyName: 'Prime',
         welcomeMessage: 'Welcome to Prime! How can I assist you today?',
-        apiUrl: 'https://nexus-staging-dupl.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'prime-web', // Predefined web channel identifier
