@@ -411,7 +411,7 @@
         textColor: '#ffffff',
         companyName: 'Royalton Hotels',
         welcomeMessage: 'Welcome to Royalton Hotels! How can I assist you today?',
-        apiUrl: 'https://nexus-development-1.onrender.com',
+        apiUrl: 'https://nexus.peregrino.co',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'royalton-web', // Predefined web channel identifier
@@ -1266,6 +1266,64 @@
 
         const idStr = messageId !== undefined && messageId !== null ? String(messageId) : null;
 
+        // CHECK FOR TEMP MESSAGE REPLACEMENT (User messages only)
+        // This ensures the message stays in its original position instead of jumping to the bottom
+        if (idStr && !idStr.startsWith('temp_') && (role === 'user' || role === 'customer')) {
+            const tempMessages = messagesContainer.querySelectorAll('[data-message-id^="temp_"]');
+            for (const tempMsg of tempMessages) {
+                // Check raw content (stored in dataset) or text content
+                const tempRawContent = tempMsg.dataset.rawContent;
+                // Use strict equality for raw content if available, otherwise permissive includes
+                if ((tempRawContent && tempRawContent === content) || 
+                    (!tempRawContent && tempMsg.textContent.includes(content))) {
+                    
+                    console.log(`♻️ Replacing temp message ${tempMsg.dataset.messageId} with confirmed ${idStr} in-place`);
+                    
+                    // Update ID in set
+                    if (displayedMessages) {
+                        displayedMessages.delete(tempMsg.dataset.messageId);
+                        displayedMessages.add(idStr);
+                    }
+                    
+                    // Update DOM
+                    tempMsg.dataset.messageId = idStr;
+                    
+                    // Update timestamp if needed
+                    if (timestamp) {
+                        try {
+                            let date;
+                            if (typeof timestamp === 'string' && !timestamp.toLowerCase().endsWith('z') && !/[+-]\d{2}(:?\d{2})?$/.test(timestamp)) {
+                                const isoTimestamp = timestamp.trim().replace(' ', 'T') + 'Z';
+                                date = new Date(isoTimestamp);
+                            } else {
+                                date = new Date(timestamp);
+                            }
+                            
+                            if (!isNaN(date.getTime())) {
+                                const timeStr = date.toLocaleTimeString([], { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit',
+                                    hour12: true 
+                                });
+                                
+                                let metaSpan = tempMsg.querySelector('.nx-msg__meta');
+                                if (!metaSpan) {
+                                    metaSpan = document.createElement('span');
+                                    metaSpan.className = 'nx-msg__meta';
+                                    tempMsg.appendChild(metaSpan);
+                                }
+                                metaSpan.textContent = timeStr;
+                            }
+                        } catch (e) {
+                            console.error('Error updating timestamp during replacement:', e);
+                        }
+                    }
+                    
+                    return true; // Done, replaced in place
+                }
+            }
+        }
+
         // Skip if already displayed
         if (idStr && displayedMessages.has(idStr)) {
             console.log('Message already displayed, skipping:', idStr);
@@ -1491,9 +1549,8 @@
         let hasNewMessages = false;
 
         messages.forEach(msg => {
-            if (msg.sender_type === 'customer') {
-                removeTempMessage(msg.content, msg.sender_type);
-            }
+            // Temp message removal is now handled inside addMessageSafely via replacement
+            // if (msg.sender_type === 'customer') { removeTempMessage(msg.content, msg.sender_type); }
 
             const added = addMessageSafely(msg.sender_type, msg.content, msg.created_at, msg.id);
             if (added) {
@@ -1620,9 +1677,8 @@
                     }
                     
                     if (msg.id && msg.content) {
-                        if (msg.sender_type === 'customer' || msg.sender_type === 'user') {
-                            removeTempMessage(msg.content, msg.sender_type);
-                        }
+                        // Temp message removal is now handled inside addMessageSafely via replacement
+                        // if (msg.sender_type === 'customer' || msg.sender_type === 'user') { removeTempMessage(msg.content, msg.sender_type); }
                         console.log('✨ Adding message via WebSocket:', msg);
                         const wasAdded = addMessageSafely(msg.sender_type, msg.content, msg.created_at, msg.id);
                         
