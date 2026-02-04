@@ -219,11 +219,11 @@
             <ul class="config-list">
                 <li>
                     <span class="config-label">Canal:</span>
-                    <span class="config-value">nexus-tours-web</span>
+                    <span class="config-value" data-config="channel">nexustours-web</span>
                 </li>
                 <li>
                     <span class="config-label">API URL:</span>
-                    <span class="config-value">https://nexus-development-1.onrender.com</span>
+                    <span class="config-value" data-config="api-url">https://nexus-development-1.onrender.com</span>
                 </li>
                 <li>
                     <span class="config-label">Empresa:</span>
@@ -253,9 +253,19 @@
     <!-- Initialize the widget - Configuration is now predefined in the widget -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Widget is now self-configured for the web channel
-            // All settings (channel, company name, theme, etc.) are predefined
-            NexusWidget.init();
+            const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+            const apiUrl = isLocalhost
+                ? `${window.location.protocol}//${window.location.host}`
+                : "https://nexus-development-1.onrender.com";
+
+            NexusWidget.init({
+                apiUrl
+            });
+
+            const apiUrlSpan = document.querySelector('[data-config="api-url"]');
+            if (apiUrlSpan) {
+                apiUrlSpan.textContent = apiUrl;
+            }
         });
     </script>
 </body>

@@ -422,7 +422,7 @@
         textColor: '#ffffff',
         companyName: 'NexusTours',
         welcomeMessage: 'Welcome to NexusTours! How can I assist you today?',
-        apiUrl: 'https://nexus.peregrino.co',
+        apiUrl: 'https://nexus-development-1.onrender.com',
         widgetId: null,
         pollingInterval: 5000,
         channel: 'nexustours-web', // Predefined web channel identifier
@@ -488,6 +488,12 @@
     
     // Flag to indicate we're in batching mode (to filter concatenated WebSocket messages)
     let isBatchingActive = false;
+    
+    // Fallback polling for assistant response (WebSocket may miss messages during reconnection)
+    let responsePollingTimer = null;
+    let responsePollingAttempts = 0;
+    const MAX_RESPONSE_POLLING_ATTEMPTS = 12; // 12 attempts * 5 seconds = 60 seconds max wait
+    const RESPONSE_POLLING_INTERVAL = 5000; // 5 seconds between checks
 
     // Engagement state
     let hasInteracted = false;
@@ -1263,6 +1269,40 @@
             return false;
         }
 
+        // DUPLICATE CONTENT CHECK:
+        // Check if a message with the exact same content was already displayed recently.
+        // This handles the case where we receive the same message with different IDs 
+        // (e.g. one from OpenAI ID and one from Database ID).
+        if (idStr && !idStr.startsWith('temp_')) {
+            const existingMessages = messagesContainer.querySelectorAll('.nx-msg');
+            // Check only the last 10 messages for performance
+            const recentMessages = Array.from(existingMessages).slice(-10);
+            
+            for (let msg of recentMessages) {
+                // Determine role of existing message
+                const msgRole = msg.classList.contains('nx-msg--user') ? 'user' : 
+                                msg.classList.contains('nx-msg--system') ? 'system' : 'assistant';
+                
+                // Map input roles to simple roles
+                const inputRole = (role === 'customer' || role === 'user') ? 'user' : 
+                                  (role === 'system') ? 'system' : 'assistant';
+                
+                // If roles match
+                if (msgRole === inputRole) {
+                    // Check content. Prefer data-raw-content if available, fallback to textContent check
+                    const rawContent = msg.dataset.rawContent;
+                    
+                    // If we have raw content, do exact match. 
+                    // Otherwise check if textContent roughly matches (less reliable due to markdown)
+                    if ((rawContent && rawContent === content) || (!rawContent && msg.textContent.includes(content))) {
+                        console.log('Duplicate message content found, skipping:', idStr);
+                        displayedMessages.add(idStr); // Add ID to avoid re-checking
+                        return false;
+                    }
+                }
+            }
+        }
+
         // For temporary messages, check if similar content exists
         if (idStr && idStr.startsWith('temp_')) {
             const existingMessages = messagesContainer.querySelectorAll('.nx-msg');
@@ -1296,6 +1336,9 @@
             messageDiv.classList.add('nx-msg--agent');
         }
         if (idStr) messageDiv.dataset.messageId = idStr;
+
+        // Store raw content for deduplication
+        messageDiv.dataset.rawContent = content;
 
         // Parse markdown and set content
         const parsedContent = parseMarkdown(content);
@@ -1443,15 +1486,21 @@
 
     function renderMessages(messages) {
         let hasNewMessages = false;
+        let skippedCount = 0;
+        let addedCount = 0;
 
         messages.forEach(msg => {
             if (msg.sender_type === 'customer') {
                 removeTempMessage(msg.content, msg.sender_type);
             }
 
+            const wasAlreadyDisplayed = displayedMessages && displayedMessages.has(String(msg.id));
             const added = addMessageSafely(msg.sender_type, msg.content, msg.created_at, msg.id);
             if (added) {
                 hasNewMessages = true;
+                addedCount++;
+            } else if (wasAlreadyDisplayed) {
+                skippedCount++;
             }
         });
 
@@ -1553,11 +1602,11 @@
             };
             
             socket.onmessage = (event) => {
-                console.log('📨 WebSocket message received:', {
-                    data: event.data,
-                    threadId: threadId,
-                    timestamp: new Date().toISOString()
-                });
+                //console.log('📨 WebSocket message received:', {
+                //    data: event.data,
+                //    threadId: threadId,
+                //    timestamp: new Date().toISOString()
+                //});
                 
                 try {
                     const msg = JSON.parse(event.data);
@@ -1578,7 +1627,13 @@
                             removeTempMessage(msg.content, msg.sender_type);
                         }
                         console.log('✨ Adding message via WebSocket:', msg);
-                        addMessageSafely(msg.sender_type, msg.content, msg.created_at, msg.id);
+                        const wasAdded = addMessageSafely(msg.sender_type, msg.content, msg.created_at, msg.id);
+                        
+                        // Stop response polling if we received an assistant message via WebSocket
+                        if (wasAdded && (msg.sender_type === 'assistant' || msg.sender_type === 'agent')) {
+                            console.log('✅ Assistant response received via WebSocket, stopping fallback polling');
+                            stopResponsePolling();
+                        }
                     } else {
                         console.log('📝 WebSocket message without ID/content:', msg);
                     }
@@ -1600,6 +1655,68 @@
                 apiUrl: config.apiUrl
             });
             handleWebSocketReconnect();
+        }
+    }
+
+    /**
+     * Start polling for assistant response as a fallback mechanism.
+     * WebSocket may miss messages during page visibility changes or reconnections.
+     */
+    function startResponsePolling() {
+        console.log('🔍 DEBUG: startResponsePolling() ENTRY');
+        stopResponsePolling(); // Clear any existing polling
+        responsePollingAttempts = 0;
+        
+        console.log('🔄 Starting fallback response polling (in case WebSocket misses the response)');
+        console.log('🔍 DEBUG: ThreadId:', threadId, 'WebSocket state:', socket ? socket.readyState : 'no socket');
+        
+        responsePollingTimer = setInterval(async () => {
+            responsePollingAttempts++;
+            console.log(`🔄 Response polling attempt ${responsePollingAttempts}/${MAX_RESPONSE_POLLING_ATTEMPTS}`);
+            
+            if (responsePollingAttempts >= MAX_RESPONSE_POLLING_ATTEMPTS) {
+                console.log('⏹️ Max response polling attempts reached, stopping');
+                stopResponsePolling();
+                return;
+            }
+            
+            try {
+                const url = `${config.apiUrl}/widget/threads/${threadId}/messages`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    console.log('❌ Response polling fetch failed:', response.status);
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.messages && Array.isArray(data.messages)) {
+                    // Check if there are any assistant messages we haven't displayed yet
+                    const newAssistantMessages = data.messages.filter(msg => 
+                        (msg.sender_type === 'assistant' || msg.sender_type === 'agent') && 
+                        !displayedMessages.has(String(msg.id))
+                    );
+                    
+                    if (newAssistantMessages.length > 0) {
+                        console.log('✅ Found new assistant response via polling:', newAssistantMessages.length, 'message(s)');
+                        renderMessages(data.messages);
+                        stopResponsePolling(); // Stop polling once we get the response
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Response polling error:', error);
+            }
+        }, RESPONSE_POLLING_INTERVAL);
+    }
+    
+    function stopResponsePolling() {
+        if (responsePollingTimer) {
+            clearInterval(responsePollingTimer);
+            responsePollingTimer = null;
+            const stoppedAtAttempt = responsePollingAttempts;
+            responsePollingAttempts = 0;
+            console.log('⏹️ Response polling stopped');
         }
     }
 
@@ -1658,6 +1775,12 @@
             
             // Deactivate batching mode after successful send
             isBatchingActive = false;
+            
+            // Start fallback polling to ensure we get the assistant's response
+            // This is crucial because WebSocket may miss messages during reconnections
+            console.log('🔍 DEBUG: About to call startResponsePolling()');
+            startResponsePolling();
+            console.log('🔍 DEBUG: startResponsePolling() called, timer should be:', responsePollingTimer ? 'active' : 'null');
 
         } catch (error) {
             console.error('Error sending batched message:', error);
@@ -1882,5 +2005,6 @@
         
         stopHeartbeat();
         stopPolling();
+        stopResponsePolling();
     }
 })();
